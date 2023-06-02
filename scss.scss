@@ -1,0 +1,245 @@
+// declaring variables
+$head-foot-bg: #8ccff7; //bg color of header and footer, put them as one, so I can easily call it
+$all-sizes: 70px, 80px, 90px, 100px; //list of the sizes for the circles
+$colors: #4e89ae, #43658b, #ed6663, #ffa372;  //background color list for of item (rows and circle)
+
+// mixin to center the elements as per requirement
+@mixin  center {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+// mixin called breakpoint that handles the media queries as per the requirement
+
+// mixin called breakpoint with 2 param for min and max width
+@mixin breakpoint($min-width, $max-width) {
+
+    // created the media query usin the parameters
+    @media screen and (min-width: $min-width) and (max-width: $max-width) {
+
+        @content;
+        
+    }
+    
+}
+
+/* removing the default margin and padding in html */
+*{
+    margin: 0;
+    padding: 0;
+}
+
+
+// setting a background color for the body to fit target image
+body{
+    background-color: #e2eff1;
+}
+
+// editing the header with nested breakpoints
+header{
+    @include center(); //included the mixin to center the image
+    background-image: url("https://via.placeholder.com/400"); //adding the default bg image
+    background-repeat: no-repeat;
+    height: 400px; 
+    background-color: $head-foot-bg; //called the defined variable for the color
+    background-position: center center;
+
+
+    // adding the mixin, or the media queries with passed parameters based on the screen sizes
+    // , only for the header part. For each breakpoint/query, the height and images are adjusted 
+
+    // for screen sizes of 801px and above
+    @include breakpoint(801px, 0){
+
+        //   since the default has the same link as the img needed for this query, i didnt do any changes
+        height: 400px; 
+
+    }
+
+    
+    // for screen sizes from 481px to 800px
+    @include breakpoint(481px, 800px) {
+
+        background-image: url(" https://via.placeholder.com/300");
+        height: 300px;
+
+    }
+
+    // for screen sizes from 480px and below
+    @include breakpoint(480px, 0){
+
+        background-image: url(" https://via.placeholder.com/300");
+        height: 300px;
+
+    }
+    
+
+}
+
+//customized the footer based on the target image and the specification
+footer{
+
+    height: 50px;
+    background-color: $head-foot-bg;
+
+}
+
+
+// margin of top and bottom for each containers to have spaces in betwen
+.container {
+    margin: 50px 0; 
+}
+
+
+//attributes for .items in row, for them to have the same sizes and format
+.rows .item{
+
+    display: block;
+    width: 100%;
+    height: 40px;
+  
+
+}
+
+
+
+.circles{
+    display: flex; //flex to be able to change the alignment later
+    @include center(); // included the mixin to center the circles/elements
+
+    //applied some nestings so that it will be easier to manage
+
+    // only .items inside circle class will be applied
+    .item{
+        margin: 5px;
+    }
+
+
+
+
+    //for loop that will apply each radius on the all-radius list for each item, since its inside the .circles selector,
+    // this will only work for .item-# classes inside .circles
+
+    // in this case, for loop would be the best method soit wont be needed create selectors for each item just to add the radius. 
+
+    // iterate based on how many elements the $all radius have (4 values)
+     @for $radius from 1 through length($all-sizes){
+
+        // # is a placeholder for the number in the item class, (starts with item-1, to item-2 and so on) 
+         .item-#{$radius}{
+
+            // applies the dedicated radius as it loops
+            border-radius: nth($all-sizes, $radius);
+        }
+
+    }
+
+
+
+    //added the mixin/media queries for circle class, as it was said in the specifications
+
+    // for screen sizes below 620px
+    @include breakpoint(0, 620px){
+        flex-direction: column; //changed the direction to column so they will stack verticall for only screen sizes below 620px
+    }
+
+
+
+
+}
+
+
+
+// edited the .items-# selector and used @extend to have same format, decided to do inheritance so each attributes are arranged properly (especially when converted to css)
+ .item-1{
+
+    cursor: pointer; 
+    display: inline-block; //for the circles to be aligned, as a default
+
+    // adjusted the width and height based on the the pos of the list
+    width: nth($all-sizes, 1);
+    height: nth($all-sizes, 1);
+    background-color: nth($colors, 1 ); //changed the background color  of the rows and circle using the colors in $colors list
+
+    &:hover{
+        // since all items needed to have the same hover style (as per the specification), i just applied the hover style to item-1 (since other items inherited item-1)
+        background-color: #444;
+        color: black; 
+    }
+        
+}
+
+
+// to not type the same contents all over again, i inherited the item-1 for them to have some formats
+//and just override the other contents that needs to be edited
+
+.item-2{
+    @extend .item-1;
+    // since the circles had different sizes, the width and height for each item is adjusted.
+    width: nth($all-sizes, 2);
+    height: nth($all-sizes, 2);
+    background-color: nth($colors, 2 ); //changed the background color using the colors in $colors list
+    
+}
+
+// the rest of the methods are the same
+.item-3{
+    @extend .item-1;
+    width: nth($all-sizes, 3);
+    height: nth($all-sizes, 3);
+    background-color: nth($colors, 3 ); 
+        
+}
+
+.item-4{
+    @extend .item-1;
+    width: nth($all-sizes, 4);
+    height: nth($all-sizes, 4);
+    background-color: nth($colors, 4);
+
+}
+
+
+
+
+
+
+// ALTERNATIVE METHOD FOR BG COLORS EACH ITEM
+
+// using these alternatives will result to different selectors when converted to css, there were just way too much repetative selector  and I didnt like it. 
+
+// there will be seperate selectors
+// this for loop is another way to change the background color of the item-#
+
+// @for $color from 1 through length($colors){
+
+//    .item-#{$color} {
+//         background-color: nth($colors, $color );
+//     }
+// }
+
+
+// ALTERNATIVE METHOD FOR CHANGING THE WIDTH, HEIGHT, RAIDUS, COLORS OF  ITEMS
+// using for loop would also be a simpler method to  apply all attributes as one
+// change the width and height
+
+
+// @for $components from 1 through length($all-sizes){
+
+// //     // # is a placeholder for the number in the item class, (starts with item-1, to item-2 and so on) 
+//      .item-#{$components}{
+
+//         // applies the dedicated attributes as it loops
+//         @extend .item-1;
+//         background-color: nth($colors, $components );
+//         width: nth($all-sizes, $components);
+//         height: nth($all-sizes, $components);
+     
+
+//     }
+
+// }
